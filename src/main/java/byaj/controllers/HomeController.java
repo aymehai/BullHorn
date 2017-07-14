@@ -289,7 +289,7 @@ public class HomeController {
 	}
 
 	// News Feed Get & Post Mapping (NOT DONE)
-
+	
 	@GetMapping("/news")
 	public String newsFeed(Model model) {
 		model.addAttribute("post", new Post());
@@ -300,8 +300,8 @@ public class HomeController {
 	}
 
 	@PostMapping("/news")
-	public String newsFeedPageResults(@Valid Follow follow, BindingResult bindingResult, Principal principal,
-			Model model) {
+	public String newsFeedPageResults(@Valid Follow follow, BindingResult bindingResult, Principal principal, Model model) {
+		
 		if (bindingResult.hasErrors()) {
 			return "redirect:/";
 		}

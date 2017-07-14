@@ -52,7 +52,7 @@ public class User {
 	@JoinTable(joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Collection<Role> roles;
 
-	@ManyToMany // (fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = "follow_status", joinColumns = @JoinColumn(name = "following_id"), inverseJoinColumns = @JoinColumn(name = "followed_id"))
 	private Collection<User> following;
 	
@@ -60,10 +60,10 @@ public class User {
     @JoinTable(name="likes",joinColumns = @JoinColumn(name = "user_id"),inverseJoinColumns = @JoinColumn(name = "post_id"))
     private Collection<Post> likes;
 
-	@ManyToMany // (fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = "follow_status", joinColumns = @JoinColumn(name = "followed_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
 	private Collection<User> followed;
-
+	
 	public User(String email, String password, String firstName, String lastName, boolean enabled, String username,
 			String profilePic) {
 		this.email = email;
