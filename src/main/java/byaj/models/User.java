@@ -48,6 +48,8 @@ public class User {
 
     @Column(name = "user_date")
     private Date userDate=new Date();
+    
+    private String profilePic;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -62,13 +64,14 @@ public class User {
     @JoinTable(name="follow_status", joinColumns = @JoinColumn(name = "followed_id"),inverseJoinColumns = @JoinColumn(name = "following_id"))
     private Collection<User> followed;
 
-    public User(String email, String password, String firstName, String lastName, boolean enabled, String username) {
+    public User(String email, String password, String firstName, String lastName, boolean enabled, String username, String profilePic) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.enabled = enabled;
         this.username = username;
+        this.profilePic = profilePic;
         fullName = firstName + " " + lastName;
 
     }
@@ -193,4 +196,12 @@ public class User {
         SimpleDateFormat format = new SimpleDateFormat("EEEE MMMMM dd, yyyy hh:mm a zzzz", Locale.US);
         return format.format(userDate);
     }
+
+	public String getProfilePic() {
+		return profilePic;
+	}
+
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
 }

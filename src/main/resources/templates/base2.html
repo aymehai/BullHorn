@@ -37,13 +37,14 @@
                 <li sec:authorize="hasAnyAuthority('USER', 'EMPLOYER', 'ADMIN')"><a href="/users">Discover</a></li>
                 <li sec:authorize="hasAnyAuthority('USER', 'EMPLOYER', 'ADMIN')"><a href="/following">Following</a></li>
                 <li sec:authorize="hasAnyAuthority('USER', 'EMPLOYER', 'ADMIN')"><a href="/followers">Followers</a></li>
+                <li sec:authorize="hasAnyAuthority('USER', 'EMPLOYER', 'ADMIN')"><a href="/account">Account</a></li>
                 <li sec:authorize="isAnonymous()"><a href="/login">Login</a></li>
                 <li sec:authorize="isAuthenticated()"><a href="/logout">Logout</a></li>
                 <li sec:authorize="isAnonymous()"><a href="/register">Register</a></li>
             </ul>
             <!--<ul class="nav navbar-nav navbar-right">-->
             <ul class="nav navbar-nav">
-                <li class="icon-bar" sec:authorize="isAuthenticated()"><a href="#">Welcome, <span sec:authentication="principal.authorities">ROLE_USER, ROLE_ADMIN</span> <span sec:authentication="name">...</span></a></li>
+                <li class="icon-bar" sec:authorize="isAuthenticated()"><a href="#">Welcome, <span sec:authentication="name">...</span></a></li>
             </ul>
                 <!--</ul>-->
         </div><!--/.nav-collapse -->

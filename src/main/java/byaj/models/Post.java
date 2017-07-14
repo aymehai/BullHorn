@@ -94,4 +94,5 @@ public class Post {
 	public void setFilterName(String filterName) {
 		this.filterName = filterName;
 	}
+
 }

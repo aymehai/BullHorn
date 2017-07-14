@@ -13,32 +13,18 @@
 
 	<div class="container">
 		<br /> <br /> <br />
-		<h4>Post</h4>
-
-		<form id="myform" th:action="@{/post}" th:object="${post}" method="post" enctype="multipart/form-data">
-			<div class="form-group">
-				<label for="title">Post</label>
-				<textarea type="text" class="form-control" id="title" placeholder="What would you like to say =)" th:field="*{postName}"></textarea>
-			</div>
+		<h4>Account</h4>
+		<h3><span sec:authentication="name">...</span></h3>
+		<div th:object="${profile}" ><img th:utext="${profile.profilePic}" /></div>
+		
+		<form id="myform" th:action="@{account}"
+			method="POST" enctype="multipart/form-data">
 			<div class="form-group">
 				<input type="file" name="file" />
-				<h3>Filter Type</h3>
-				grayscale <input type="radio" th:name="filterName" th:id="filterName" value="grayscale" /> 
-				<br /> 
-				sepia <input type="radio" th:name="filterName" th:id="filterName" value="sepia" />
-				<br /> 
-				blackwhite <input type="radio" th:name="filterName" th:id="filterName" value="blackwhite" />
 			</div>
 		</form>
-		<!-- <form id="myform" th:action="@{imageUpload}" th:object="${user}" method="POST" enctype="multipart/form-data">
-		
-			<div class=
-		</form>
-		-->
-		<input type="submit" form="myform" class="btn btn-default"
-			value="Upload" />
+		<input type="submit" form="myform" class="btn btn-default" value="Upload" />
 
-		<!-- 
 	<br />
     <table class="table table-striped">
         <tr>
@@ -53,7 +39,6 @@
             <td th:text="${row.getFormatDate()}"></td>
         </tr>
     </table>
- -->
 	</div>
 	<!-- /.container -->
 

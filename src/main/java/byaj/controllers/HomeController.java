@@ -4,19 +4,16 @@ import byaj.configs.CloudinaryConfig;
 import byaj.models.*;
 import byaj.repositories.*;
 import byaj.validators.UserValidator;
-
-import org.mockito.internal.stubbing.answers.ThrowsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.cloudinary.utils.ObjectUtils;
 import javax.validation.Valid;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
@@ -42,6 +39,9 @@ public class HomeController {
 	@Autowired
 	CloudinaryConfig cloudc;
 
+	@Autowired
+	RoleRepository roleRepository;
+
 	// Home page That shows all tweets in database
 
 	@RequestMapping("/")
@@ -50,29 +50,6 @@ public class HomeController {
 		model.addAttribute("follow", new Follow());
 		model.addAttribute("posts", postRepository.findAllByOrderByPostDateDesc());
 		return "postresults2";
-	}
-
-	// Registration page Get and Post mappings
-
-	@GetMapping("/register2")
-	public String showRegistrationPage(Model model) {
-		model.addAttribute("user", new User());
-		return "register2";
-	}
-
-	@PostMapping("/register2")
-	public String processRegistrationPage(@Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
-
-		model.addAttribute("user", user);
-		userValidator.validate(user, result);
-
-		if (result.hasErrors()) {
-			return "register2";
-		} else {
-			userService.saveUser(user);
-			model.addAttribute("message", "User Account Successfully Created");
-		}
-		return "redirect:/";
 	}
 
 	// Request Mapping for Login Page
@@ -94,10 +71,15 @@ public class HomeController {
 	}
 
 	@PostMapping("/post")
-	public String processPost(@RequestParam("file") MultipartFile file, @Valid Post post, BindingResult bindingResult,
+	public String processPost(@RequestParam("file") MultipartFile file, @Valid Post post,
 			Principal principal) {
-		if (bindingResult.hasErrors()) {
-			return "redirect:/post";
+		if (file.isEmpty()) {
+			post.setUrlOriginal(null);
+			post.setUrlModified(null);
+			post.setPostUser(userRepository.findByUsername(principal.getName()).getId());
+			post.setPostAuthor(userRepository.findByUsername(principal.getName()).getUsername());
+			postRepository.save(post);
+			return "redirect:/";
 		}
 		try {
 			// Uses an automatic naming scheme for the resource
@@ -105,7 +87,6 @@ public class HomeController {
 
 			// Gets the name of the file
 			String name = uploadResult.get("public_id").toString();
-
 			String originalImage = cloudc.createUrl(name, 100, 150, "fit", "");
 			String ModdedImage = cloudc.createUrl(name, 100, 150, "fit", post.getFilterName());
 			post.setUrlOriginal(originalImage);
@@ -113,11 +94,45 @@ public class HomeController {
 			post.setPostUser(userRepository.findByUsername(principal.getName()).getId());
 			post.setPostAuthor(userRepository.findByUsername(principal.getName()).getUsername());
 			postRepository.save(post);
-			return "postresults2";
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "redirect:/postresults2";
+		return "redirect:/";
+	}
+
+	// Account Get and Post Mapping
+
+	@GetMapping("/account")
+	public String GetProfilePic(Model model, Principal principal) {
+		model.addAttribute("profile", userRepository.findByUsername(principal.getName()));
+		return "account";
+	}
+
+	@PostMapping("/account")
+	public String processProfilePic(@RequestParam("file") MultipartFile file,
+			RedirectAttributes redirectAttributes, Principal principal) {
+		if (file.isEmpty()) {
+			return "redirect:/account";
+		}
+
+		try {
+			// Uses an automatic naming scheme for the resource
+			Map uploadResult = cloudc.upload(file.getBytes(), ObjectUtils.asMap("resource", "auto"));
+
+			// Gets the name of the file
+			String name = uploadResult.get("public_id").toString();
+
+			// Adds effect to images
+			String profileImage = cloudc.createUrl(name, 100, 150, "fit", "");
+
+			// Adds image Urls to database
+			userRepository.findByUsername(principal.getName()).setProfilePic(profileImage);
+			userRepository.save(userRepository.findByUsername(principal.getName()));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "redirect:/account";
 	}
 
 	// Following Get Mapping
@@ -233,13 +248,13 @@ public class HomeController {
 		return "postresults2";
 	}
 
-	//News Feed Get & Post Mapping
-	
+	// News Feed Get & Post Mapping (NOT DONE)
+
 	@GetMapping("/news")
-	public String newsFeed(){
+	public String newsFeed() {
 		return "NewsFeed";
 	}
-	
+
 	@PostMapping("/news")
 	public String newsFeedPageResults(@Valid Follow follow, BindingResult bindingResult, Principal principal,
 			Model model) {
@@ -256,5 +271,26 @@ public class HomeController {
 		}
 		return "redirect:/NewsFeed";
 	}
-	
+
+	// Registration Page
+
+	@GetMapping("/register")
+	public String showRegistrationPage(Model model) {
+		model.addAttribute("user", new User());
+		return "register2";
+	}
+
+	@PostMapping("/register")
+	public String processRegistrationPage(@Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+		model.addAttribute("user", user);
+		userValidator.validate(user, result);
+
+		if (result.hasErrors()) {
+			return "register2";
+		} else {
+			userService.saveUser(user);
+		}
+		return "redirect:/login";
+	}
+
 }

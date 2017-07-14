@@ -28,9 +28,14 @@ public class CloudinaryConfig {
             return null;
         }
     }
+    
+    public Map uploadNull(Object file, Map options){
+    	return null;
+    }
+    
     public String createUrl(String name, int width, int height, String action, String filter){
  	   String newUrl = cloudinary.url().transformation(new Transformation().width(width).height(height).border("2px_solid_black").crop(action).effect(filter)).imageTag(name);
-        System.out.println(newUrl + "THIS IS THE NEW URL");    		
  	   return newUrl;
  }
+    
 }
