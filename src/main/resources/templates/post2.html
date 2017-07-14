@@ -22,7 +22,13 @@
 			</div>
 			<div class="form-group">
 			<input type="file" name="file"/>
-			Filter Type <input type="text" th:field="*{filterName}"/>
+			<h3> Filter Type </h3>
+			
+			grayscale <input type="radio" th:name="filterName" th:id="filterName" value="grayscale"/>
+			<br/>
+			sepia <input type="radio" th:name="filterName" th:id="filterName" value="sepia"/>
+			<br/>
+			blackwhite <input type="radio" th:name="filterName" th:id="filterName" value="blackwhite"/>
 			</div>
 		</form>
 		<input type="submit" form="myform" class="btn btn-default" value="Upload" />

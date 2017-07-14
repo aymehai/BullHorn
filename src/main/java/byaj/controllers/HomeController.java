@@ -233,4 +233,28 @@ public class HomeController {
 		return "postresults2";
 	}
 
+	//News Feed Get & Post Mapping
+	
+	@GetMapping("/news")
+	public String newsFeed(){
+		return "NewsFeed";
+	}
+	
+	@PostMapping("/news")
+	public String newsFeedPageResults(@Valid Follow follow, BindingResult bindingResult, Principal principal,
+			Model model) {
+		if (bindingResult.hasErrors()) {
+			return "redirect:/";
+		}
+		if (follow.getFollowType().toLowerCase().equals("follow")) {
+			userService.followUser(userRepository.findByUsername(follow.getFollowValue()),
+					userRepository.findByUsername(principal.getName()));
+		}
+		if (follow.getFollowType().toLowerCase().equals("unfollow")) {
+			userService.unfollowUser(userRepository.findByUsername(follow.getFollowValue()),
+					userRepository.findByUsername(principal.getName()));
+		}
+		return "redirect:/NewsFeed";
+	}
+	
 }
