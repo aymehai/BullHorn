@@ -255,6 +255,25 @@ public class HomeController {
         
         return "redirect:/";
     }
+    
+    
+    @PostMapping("/likeFeed")
+    public String changeLikeFeedStatus(@Valid Like like, BindingResult bindingResult, Principal principal, Model model){
+        if(bindingResult.hasErrors()){
+            return "redirect:/NewsFeed";
+        }
+        if(like.getLikeType().toLowerCase().equals("like")){
+            userService.likePost(postRepository.findByPostID(Integer.parseInt(like.getLikeValue())), userRepository.findByUsername(principal.getName()));
+        }
+        if(like.getLikeType().toLowerCase().equals("unlike")){
+            userService.unlikePost(postRepository.findByPostID(Integer.parseInt(like.getLikeValue())), userRepository.findByUsername(principal.getName()));
+        }
+        like.setLikeUser(userRepository.findByUsername(principal.getName()).getId());
+        like.setLikeAuthor(userRepository.findByUsername(principal.getName()).getUsername());
+        likeRepository.save(like);
+        
+        return "redirect:/NewsFeed";
+    }
 
 	// View Postings of Users
 
