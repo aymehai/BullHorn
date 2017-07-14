@@ -293,25 +293,24 @@ public class HomeController {
 	
 	@GetMapping("/news")
 	public String newsFeed(Model model, Principal principal) {
-		model.addAttribute("post", new Post());
-		model.addAttribute("follow", new Follow());
-		model.addAttribute("like", new Like());
-		model.addAttribute("posts", postRepository.findAllByOrderByPostDateDesc());
-		
-		ArrayList<User> userCollection= new ArrayList();
-        for(int count = 0; count<postRepository.findAllByOrderByPostDateDesc().size(); count++){
-            userCollection.add(userRepository.findByUsername(postRepository.findAllByOrderByPostDateDesc().get(count).getPostAuthor()));
+        model.addAttribute("post", new Post());
+
+        ArrayList<User> Tweets= new ArrayList();
+        ArrayList<Post> posts = new ArrayList();
+        ArrayList<User> users = new ArrayList();
+        for(int i = 0; i<postRepository.findAllByOrderByPostDateDesc().size(); i++){
+        	Tweets.add(userRepository.findByUsername(postRepository.findAllByOrderByPostDateDesc().get(i).getPostAuthor()));
         }
-        ArrayList<Post> personalPosts = new ArrayList();
-        ArrayList<User> personalUsers = new ArrayList();
-        for(int count = 0; count<postRepository.findAllByOrderByPostDateDesc().size(); count++){
-            if(userRepository.findByUsername(principal.getName()).followingContains(userCollection.get(count))){
-                personalPosts.add(postRepository.findAllByOrderByPostDateDesc().get(count));
-                personalUsers.add(userCollection.get(count));
+        for(int i = 0; i<postRepository.findAllByOrderByPostDateDesc().size(); i++){
+            if(userRepository.findByUsername(principal.getName()).followingContains(Tweets.get(i))){
+                posts.add(postRepository.findAllByOrderByPostDateDesc().get(i));
+                users.add(Tweets.get(i));
             }
         }
-        model.addAttribute("posts", personalPosts);
-        model.addAttribute("userList", personalUsers);
+        
+        
+        model.addAttribute("posts", posts);
+        model.addAttribute("users", users);
         model.addAttribute("userPrincipal", userRepository.findByUsername(principal.getName()));
 		return "NewsFeed";
 	}
