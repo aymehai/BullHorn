@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
-/**
- * Created by student on 7/10/17.
- */
+
 @Controller
 public class HomeController {
 
@@ -41,6 +39,9 @@ public class HomeController {
 
 	@Autowired
 	RoleRepository roleRepository;
+	
+	@Autowired
+	LikeRepository likeRepository;
 
 	// Home page That shows all tweets in database
 
@@ -48,6 +49,7 @@ public class HomeController {
 	public String home(Model model) {
 		model.addAttribute("post", new Post());
 		model.addAttribute("follow", new Follow());
+		model.addAttribute("like", new Like());
 		model.addAttribute("posts", postRepository.findAllByOrderByPostDateDesc());
 		return "postresults2";
 	}
@@ -71,8 +73,7 @@ public class HomeController {
 	}
 
 	@PostMapping("/post")
-	public String processPost(@RequestParam("file") MultipartFile file, @Valid Post post,
-			Principal principal) {
+	public String processPost(@RequestParam("file") MultipartFile file, @Valid Post post, Principal principal) {
 		if (file.isEmpty()) {
 			post.setUrlOriginal(null);
 			post.setUrlModified(null);
@@ -109,8 +110,8 @@ public class HomeController {
 	}
 
 	@PostMapping("/account")
-	public String processProfilePic(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes, Principal principal) {
+	public String processProfilePic(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
+			Principal principal) {
 		if (file.isEmpty()) {
 			return "redirect:/account";
 		}
@@ -234,6 +235,26 @@ public class HomeController {
 		}
 		return "redirect:/";
 	}
+	
+	
+    @PostMapping("/like")
+    public String changeLikeStatus(@Valid Like like, BindingResult bindingResult, Principal principal, Model model){
+        if(bindingResult.hasErrors()){
+            return "redirect:/";
+        }
+        if(like.getLikeType().toLowerCase().equals("like")){
+            userService.likePost(postRepository.findByPostID(Integer.parseInt(like.getLikeValue())), userRepository.findByUsername(principal.getName()));
+        }
+        if(like.getLikeType().toLowerCase().equals("unlike")){
+            userService.unlikePost(postRepository.findByPostID(Integer.parseInt(like.getLikeValue())), userRepository.findByUsername(principal.getName()));
+        }
+        like.setLikeValue(null);
+        like.setLikeUser(userRepository.findByUsername(principal.getName()).getId());
+        like.setLikeAuthor(userRepository.findByUsername(principal.getName()).getUsername());
+        likeRepository.save(like);
+        
+        return "redirect:/";
+    }
 
 	// View Postings of Users
 
@@ -251,7 +272,11 @@ public class HomeController {
 	// News Feed Get & Post Mapping (NOT DONE)
 
 	@GetMapping("/news")
-	public String newsFeed() {
+	public String newsFeed(Model model) {
+		model.addAttribute("post", new Post());
+		model.addAttribute("follow", new Follow());
+		model.addAttribute("like", new Like());
+		model.addAttribute("posts", postRepository.findAllByOrderByPostDateDesc());
 		return "NewsFeed";
 	}
 

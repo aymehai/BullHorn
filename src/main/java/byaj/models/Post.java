@@ -1,10 +1,8 @@
 package byaj.models;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -30,7 +28,9 @@ public class Post {
     private String urlModified;
     
     private Date postDate=new Date();
-
+    
+    @ManyToMany(mappedBy = "likes")
+    private Collection<User> users;
 
     public int getPostID() {
         return postID;
@@ -94,5 +94,22 @@ public class Post {
 	public void setFilterName(String filterName) {
 		this.filterName = filterName;
 	}
+	
+    public Collection<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Collection<User> users) {
+        this.users = users;
+    }
+
+    public boolean usersContains(User user){
+        if(users.contains(user)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 }
