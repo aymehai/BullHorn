@@ -214,4 +214,12 @@ public class User {
             return false;
         }
     }
+    public boolean followingContains(User user){
+        if(following.contains(user)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }

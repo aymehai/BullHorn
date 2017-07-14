@@ -16,6 +16,7 @@ import com.cloudinary.utils.ObjectUtils;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -291,11 +292,27 @@ public class HomeController {
 	// News Feed Get & Post Mapping (NOT DONE)
 	
 	@GetMapping("/news")
-	public String newsFeed(Model model) {
+	public String newsFeed(Model model, Principal principal) {
 		model.addAttribute("post", new Post());
 		model.addAttribute("follow", new Follow());
 		model.addAttribute("like", new Like());
 		model.addAttribute("posts", postRepository.findAllByOrderByPostDateDesc());
+		
+		ArrayList<User> userCollection= new ArrayList();
+        for(int count = 0; count<postRepository.findAllByOrderByPostDateDesc().size(); count++){
+            userCollection.add(userRepository.findByUsername(postRepository.findAllByOrderByPostDateDesc().get(count).getPostAuthor()));
+        }
+        ArrayList<Post> personalPosts = new ArrayList();
+        ArrayList<User> personalUsers = new ArrayList();
+        for(int count = 0; count<postRepository.findAllByOrderByPostDateDesc().size(); count++){
+            if(userRepository.findByUsername(principal.getName()).followingContains(userCollection.get(count))){
+                personalPosts.add(postRepository.findAllByOrderByPostDateDesc().get(count));
+                personalUsers.add(userCollection.get(count));
+            }
+        }
+        model.addAttribute("posts", personalPosts);
+        model.addAttribute("userList", personalUsers);
+        model.addAttribute("userPrincipal", userRepository.findByUsername(principal.getName()));
 		return "NewsFeed";
 	}
 
